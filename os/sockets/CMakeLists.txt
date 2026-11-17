@@ -20,3 +20,6 @@ target_link_libraries(sender PRIVATE udp_socket)
 
 add_executable(receiver receiver.cpp)
 target_link_libraries(receiver PRIVATE udp_socket)
+
+add_executable(announcer announce.cpp)
+target_link_libraries(announcer PRIVATE udp_socket)
