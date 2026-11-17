@@ -113,3 +113,21 @@ std::size_t UdpSocket::receive_from(std::vector<unsigned char> & buf, sockaddr_i
 
 	return static_cast<std::size_t>(received);
 }
+
+std::optional<std::size_t> UdpSocket::try_receive_from(std::vector<unsigned char> & buf,
+						       sockaddr_in & from)
+{
+	socklen_t from_len = sizeof(from);
+
+	const ssize_t received = ::recvfrom(fd_, buf.data(), buf.size(), 0,
+					    reinterpret_cast<sockaddr *>(&from), &from_len);
+
+	if (received == -1) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
+			return std::nullopt;   // timeout or signal: not an error
+		}
+		throw_errno("recvfrom");
+	}
+
+	return static_cast<std::size_t>(received);
+}
